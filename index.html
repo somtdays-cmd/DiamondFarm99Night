@@ -135,6 +135,151 @@
             visibility: hidden;
         }
 
+        /* Popup Styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-container {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease;
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .popup-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .popup-description {
+            font-size: 1rem;
+            color: #555;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .progress-container {
+            margin-bottom: 25px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-text {
+            font-size: 0.95rem;
+            color: #777;
+            font-weight: 500;
+        }
+
+        .progress-counter {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e5e5;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+            border-radius: 10px;
+            transition: width 0.8s ease;
+            width: 0%;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+        }
+
+        .popup-button {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(45deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            position: relative;
+        }
+
+        .popup-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6);
+        }
+
+        .popup-button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .popup-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .popup-button.completed {
+            background: linear-gradient(45deg, #10b981, #059669);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .popup-button.completed:hover {
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6);
+        }
+
+        .button-icon {
+            margin-right: 8px;
+        }
+
         /* Main Content */
         .container {
             max-width: 1200px;
@@ -480,6 +625,19 @@
                 width: 100%;
                 margin-top: 10px;
             }
+
+            .popup-container {
+                padding: 30px 20px;
+                border-radius: 16px;
+            }
+
+            .popup-title {
+                font-size: 1.3rem;
+            }
+
+            .popup-description {
+                font-size: 0.95rem;
+            }
         }
     </style>
 </head>
@@ -496,6 +654,28 @@
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-spinner"></div>
         <div class="loading-text">กำลังโหลด...</div>
+    </div>
+
+    <!-- Popup -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-container">
+            <h2 class="popup-title">🔒 ขั้นตอนสำคัญ 🔑</h2>
+            <p class="popup-description">กดดูปุ่มด้านล่างแล้วกดย้อนกลับ 3 ครั้งเพื่อปลดล็อคสคริป</p>
+            
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span class="progress-text">ความคืบหน้า</span>
+                    <span class="progress-counter"><span id="progressCount">0</span>/3</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <button class="popup-button" id="popupButton">
+                <span class="button-icon">📰</span><span id="buttonText">ดูโฆษณา</span>
+            </button>
+        </div>
     </div>
 
     <div class="main-content">
@@ -541,6 +721,54 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
 
     <script>
+        // Popup Variables
+        let clickCount = 0;
+        const maxClicks = 5;
+        const adUrl = 'https://www.effectivegatecpm.com/upi2cccq?key=c0d5a38e346630625f6d41c6ae58f71d';
+        const popupOverlay = document.getElementById('popupOverlay');
+        const popupButton = document.getElementById('popupButton');
+        const progressCount = document.getElementById('progressCount');
+        const progressFill = document.getElementById('progressFill');
+        const buttonText = document.getElementById('buttonText');
+
+        function showPopup() {
+            setTimeout(() => {
+                popupOverlay.classList.add('active');
+            }, 500);
+        }
+
+        function updateProgress() {
+            progressCount.textContent = clickCount;
+            const percentage = (clickCount / maxClicks) * 100;
+            progressFill.style.width = percentage + '%';
+        }
+
+        function handleButtonClick() {
+            if (clickCount < maxClicks) {
+                popupButton.disabled = true;
+
+                if (clickCount === 0) {
+                    window.open(adUrl, '_blank', 'width=800,height=600');
+                }
+
+                // Delay ก่อนอัพเดท progress
+                setTimeout(() => {
+                    clickCount++;
+                    updateProgress();
+                    popupButton.disabled = false;
+
+                    if (clickCount === maxClicks) {
+                        popupButton.classList.add('completed');
+                        buttonText.textContent = 'เสร็จแล้ว! ปิดหน้าต่าง ✓';
+                        setTimeout(() => {
+                            popupOverlay.classList.remove('active');
+                        }, 1500);
+                    }
+                }, 800);
+            }
+        }
+
+        // Background Setup
         function getYouTubeEmbedUrl(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
@@ -550,6 +778,7 @@
             }
             return null;
         }
+
         function initBackground() {
             const backgroundType = getComputedStyle(document.documentElement).getPropertyValue('--background-type').replace(/['"]/g, '');
             const backgroundUrl = getComputedStyle(document.documentElement).getPropertyValue('--background-url').replace(/['"]/g, '');
@@ -557,6 +786,7 @@
             const youtubeUrl = getComputedStyle(document.documentElement).getPropertyValue('--youtube-url').replace(/['"]/g, '');            
             setBackground(backgroundType, backgroundType === 'youtube' ? youtubeUrl : backgroundType === 'video' ? videoUrl : backgroundUrl);
         }
+
         function setBackground(type, url) {
             const backgroundImage = document.getElementById('backgroundImage');
             const backgroundVideo = document.getElementById('backgroundVideo');
@@ -619,7 +849,7 @@
                 copyButton.textContent = '✅ คัดลอกแล้ว!';
                 copyButton.style.background = 'linear-gradient(45deg, #10b981, #059669)';
                 
-                setTimeout(() => { // เปลี่ยนหน้าไปที่ URL ที่ระบุ
+                setTimeout(() => {
                     window.location.href = 'https://www.effectivegatecpm.com/upi2cccq?key=c0d5a38e346630625f6d41c6ae58f71d';
                 }, 50);
                 
@@ -631,14 +861,18 @@
             document.body.removeChild(tempTextArea);
         }
 
+        // Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
             Prism.highlightAll();
             
             initBackground();
             hideLoading();
+            showPopup();
             
             const copyButton = document.getElementById('copyButton');
             copyButton.addEventListener('click', copyScript);
+            
+            popupButton.addEventListener('click', handleButtonClick);
         });
 
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
