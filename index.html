@@ -73,6 +73,83 @@
             display: none;
         }
 
+        .info-box {
+            padding: 20px;
+        }
+
+        .info-box-content {
+            grid-template-columns: 1fr;
+        }
+
+        .info-item {
+            padding: 12px;
+        }
+
+        /* Info Box Styles */
+        .info-box {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.1));
+            border: 2px solid rgba(139, 92, 246, 0.4);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .info-box:hover {
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.25);
+        }
+
+        .info-box-title {
+            font-family: 'Space Grotesk', 'Noto Sans Thai', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--light-purple);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-box-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid var(--primary-purple);
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            background: rgba(139, 92, 246, 0.15);
+            transform: translateX(5px);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--light-purple);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: #ffffff;
+            font-weight: 600;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
         .popup-overlay {
             position: fixed;
             top: 0;
@@ -750,6 +827,30 @@
 
             <section class="section script-section">
                 <h2 class="section-title">💎 สคริปฟาร์มเพชร 99 คืนในป่า ✨</h2>
+
+                <!-- Info Box -->
+                <div class="info-box">
+                    <h3 class="info-box-title">ℹ️ ข้อมูลสคริป</h3>
+                    <div class="info-box-content">
+                        <div class="info-item">
+                            <span class="info-label">📅 อัพเดทล่าสุด</span>
+                            <span class="info-value">15 พฤศจิกายน 2025</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">🎮 รองรับเกม</span>
+                            <span class="info-value">99 Night in the Forest</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">⚙️ เวอร์ชัน</span>
+                            <span class="info-value">v2.1 Stable</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">✅ สถานะ</span>
+                            <span class="info-value" style="color: #10b981;">ทำงานได้ปกติ</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="script-container">
                     <div class="script-content" id="scriptContent">
                         <pre><code class="language-lua">-- ไม่ต้องแปลภาษานะครับ คัดลอกเลยย
@@ -806,7 +907,7 @@
                 openAdBtn.classList.add("completed");
                 setTimeout(() => {
                     popupOverlay.classList.remove("active");
-                }, 6500);
+                }, 1500);
             }
         });
 
@@ -867,7 +968,7 @@
             setTimeout(() => {
                 const loadingScreen = document.getElementById('loadingScreen');
                 loadingScreen.classList.add('hidden');
-            }, 2000);
+            }, 1000);
         }
 
         function copyScript() {
@@ -890,11 +991,7 @@
                 copySuccess.classList.add('show');
                 copyButton.textContent = '✅ คัดลอกแล้ว!';
                 copyButton.style.background = 'linear-gradient(45deg, #10b981, #059669)';
-
-                setTimeout(() => {
-                    window.location.href = 'https://www.effectivegatecpm.com/upi2cccq?key=c0d5a38e346630625f6d41c6ae58f71d';
-                }, 50);
-
+                
             } catch (err) {
                 console.error('ไม่สามารถคัดลอกได้:', err);
                 alert('ไม่สามารถคัดลอกได้ กรุณาคัดลอกด้วยตนเอง');
@@ -909,7 +1006,6 @@
 
             initBackground();
             hideLoading();
-            showPopup();
 
             const copyButton = document.getElementById('copyButton');
             copyButton.addEventListener('click', copyScript);
