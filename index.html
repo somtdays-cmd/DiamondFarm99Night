@@ -707,8 +707,8 @@
     <!-- POPUP OVERLAY -->
     <div id="popupOverlay" class="popup-overlay">
         <div class="popup-container">
-            <h2 class="popup-title">🔒 ปลดล็อคสคริป</h2>
-            <p class="popup-description">! กดดูโฆษณาแล้วรอ 5 วินาทีแล้วค่อยกดออก 3 ครั้งเพื่อรับสคริป 🗝️</p>
+            <h2 class="popup-title">ปลดล็อคสคริป</h2>
+            <p class="popup-description">กดเข้าลิงก์ให้ครบ 3 ครั้งเพื่อรับสคริป</p>
 
             <div class="progress-container">
                 <div class="progress-label">
@@ -721,7 +721,7 @@
             </div>
 
             <button id="openAdBtn" class="popup-button">
-                ดูโฆษณา
+                เปิดโฆษณา
             </button>
         </div>
     </div>
@@ -769,38 +769,44 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
 
     <script>
+        // ลิสต์ลิงก์โฆษณา
+        const adLinks = [
+            "https://www.effectivegatecpm.com/upi2cccq?key=c0d5a38e346630625f6d41c6ae58f71d",
+            "https://www.effectivegatecpm.com/f9vfat61j?key=eb09e10020cbeb160083cb6be1915951",
+            "https://www.effectivegatecpm.com/u6syh2sy?key=33dca3d0d40ee76877e704c022a179f6"
+        ];
+
         let clickCount = 0;
-        const maxClicks = 3;
+        const maxClicks = adLinks.length;
 
         const popupOverlay = document.getElementById("popupOverlay");
         const openAdBtn = document.getElementById("openAdBtn");
         const progressFill = document.getElementById("progressFill");
         const counterText = document.getElementById("counterText");
 
-        // เปิด popup ตอนโหลดหน้า
         window.addEventListener("load", () => {
             popupOverlay.classList.add("active");
         });
 
-        // ปุ่มเปิดโฆษณา
         openAdBtn.addEventListener("click", () => {
-            // เปิดลิงก์โฆษณา *ทุกครั้ง*
-            window.open("https://www.effectivegatecpm.com/upi2cccq?key=c0d5a38e346630625f6d41c6ae58f71d", "_blank");
+            // ถ้ากดไม่เกินจำนวนลิงก์ → เปิดลิงก์ตามลำดับ
+            if (clickCount < adLinks.length) {
+                window.open(adLinks[clickCount], "_blank");
+            }
 
             clickCount++;
 
-            // อัปเดตเคาน์เตอร์
+            // อัปเดต progress bar
             counterText.textContent = `${clickCount} / ${maxClicks}`;
             progressFill.style.width = (clickCount / maxClicks * 100) + "%";
 
-            // ถ้าครบ → ปลดล็อค
+            // เมื่อครบทุกลิงก์ → ปลดล็อค
             if (clickCount >= maxClicks) {
                 openAdBtn.textContent = "ปลดล็อคแล้ว ✔";
                 openAdBtn.classList.add("completed");
-
                 setTimeout(() => {
                     popupOverlay.classList.remove("active");
-                }, 600);
+                }, 6500);
             }
         });
 
